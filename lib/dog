@@ -1,0 +1,109 @@
+ class EditPetPage extends StatefulWidget {
+   final MyPet myPet;
+
+   const EditPetPage({required this.myPet});
+
+   @override
+   _EditPetPageState createState() => _EditPetPageState();
+ }
+
+ class _EditPetPageState extends State<EditPetPage> {
+   late TextEditingController ownerController;
+   late TextEditingController phoneController;
+   // Initialize other controllers for different fields
+
+   @override
+   void initState() {
+     super.initState();
+     ownerController = TextEditingController(text: widget.myPet.owner);
+     phoneController = TextEditingController(text: widget.myPet.phone);
+     // Initialize other controllers with respective widget.myPet values
+   }
+
+   @override
+   void dispose() {
+     ownerController.dispose();
+     phoneController.dispose();
+     // Dispose other controllers
+     super.dispose();
+   }
+
+   Future<void> updatePetDetails() async {
+     // Update the fields in Firestore with the new values from the controllers
+     await FirebaseFirestore.instance.collection('Pets').doc(widget.myPet.id).update({
+       'owner': ownerController.text,
+       'phone': phoneController.text,
+       // Update other fields similarly
+     });
+
+     // Show a snackbar or navigate back to the previous screen
+     ScaffoldMessenger.of(context).showSnackBar(
+       SnackBar(
+         content: Text('Changes Saved Successfully'),
+         duration: Duration(seconds: 2),
+       ),
+     );
+   }
+
+   @override
+   Widget build(BuildContext context) {
+     return Scaffold(
+       appBar: AppBar(
+         title: Text('Edit Pet'),
+       ),
+       body: SingleChildScrollView(
+         child: Column(
+           crossAxisAlignment: CrossAxisAlignment.center,
+           children: [
+             Container(
+               decoration: BoxDecoration(
+                 color: Colors.white,
+                 borderRadius: BorderRadius.only(
+                   bottomLeft: Radius.circular(50),
+                   bottomRight: Radius.circular(50),
+                 ),
+               ),
+               padding: EdgeInsets.all(16.0),
+               child: Column(
+                 children: [
+                   SizedBox(height: 16.0),
+                   // Other widgets remain the same
+                   // Replace Text widgets with TextField widgets for editable fields
+                   // Example:
+                   TextFormField(
+                     controller: ownerController,
+                     decoration: InputDecoration(
+                       labelText: 'Owner Name',
+                     ),
+                   ),
+                   TextFormField(
+                     controller: phoneController,
+                     decoration: InputDecoration(
+                       labelText: 'Phone Number',
+                     ),
+                   ),
+                   // Other editable fields
+                 ],
+               ),
+             ),
+             SizedBox(height: 16),
+             ElevatedButton(
+               onPressed: updatePetDetails,
+               child: Text('Save Changes'),
+               style: ElevatedButton.styleFrom(
+                 shape: RoundedRectangleBorder(
+                   borderRadius: BorderRadius.circular(20.0),
+                 ),
+               ),
+             ),
+             Divider(
+               color: Colors.grey,
+               thickness: 2.0,
+             ),
+             // Rest of the content remains the same
+           ],
+         ),
+       ),
+     );
+   }
+ }
